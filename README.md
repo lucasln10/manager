@@ -17,7 +17,7 @@ Um sistema de gerenciamento desenvolvido com Laravel 12, Livewire 3 e Tailwind C
 - PHP 8.2 ou superior
 - Composer
 - Node.js e NPM
-- SQLite (ou outro banco de dados suportado pelo Laravel)
+- MySQL (ou outro banco de dados suportado pelo Laravel)
 
 ## 🔧 Instalação
 
