@@ -1,0 +1,18 @@
+/* Navbar */
+.navbar {
+  background-color: #1e3a8a !important; /* Azul escuro */
+}
+
+.navbar .nav-link {
+  color: white !important;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  background-color: transparent;
+}
+
+.navbar .nav-link:hover {
+  background-color: #3b82f6; /* Azul mais claro ao hover */
+  color: white !important;
+}
