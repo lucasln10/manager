@@ -12,11 +12,12 @@ class Departamento extends Model
     protected $fillable = [
         'name',
         'sigla',
+        'user_id',
     ];
 
-    public function cargo()
+    public function cargos()
     {
-        return $this->hasMany(Cargo::class, 'cargo_id');
+        return $this->hasMany(Cargo::class, 'departamento_id');
     }
     public function user()
     {

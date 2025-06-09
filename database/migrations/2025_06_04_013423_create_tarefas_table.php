@@ -23,9 +23,9 @@ return new class extends Migration
             $table->boolean('atrasada')->default(false);
             $table->boolean('cancelada')->default(false);
             $table->boolean('pendente')->default(false);
-            $table->foreignId('funcionario_id')->constrained('funcionarios')->nullable();
-            $table->foreignId('departamento_id')->constrained('departamentos')->nullable();
-            $table->foreignId('cargo_id')->constrained('cargos')->nullable();
+            $table->foreignId('funcionario_id')->constrained('funcionarios');
+            $table->foreignId('departamento_id')->constrained('departamentos');
+            $table->foreignId('cargo_id')->constrained('cargos');
             $table->timestamps();
         });
     }

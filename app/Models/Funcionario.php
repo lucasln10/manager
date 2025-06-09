@@ -18,7 +18,8 @@ class Funcionario extends Model
         'telefone',
         'image',
         'cargo_id',
-        'departamento_id'
+        'departamento_id',
+        'user_id'
     ];
 
     public function user()

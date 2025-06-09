@@ -15,12 +15,13 @@ class Cargo extends Model
         'name',
         'descricao',
         'nivel',
-        'departamento_id'
+        'departamento_id',
+        'user_id'
     ];
 
     public function funcionarios()
     {
-        return $this->hasMany(Funcionario::class);
+        return $this->hasMany(Funcionario::class, 'cargo_id');
     }
     public function user()
     {

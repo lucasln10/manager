@@ -77,4 +77,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(Cargo::class, 'user_id');
     }
+    public function tarefas()
+    {
+        return $this->hasMany(Tarefa::class, 'user_id');
+    }
 }

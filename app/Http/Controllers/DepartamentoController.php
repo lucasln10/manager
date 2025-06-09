@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Departamento;
 use App\Models\User;
+use App\Models\Cargo;
 use Illuminate\Support\Facades\Auth;
 
 class DepartamentoController extends Controller
@@ -56,12 +57,11 @@ class DepartamentoController extends Controller
             'sigla' => 'required|string|max:10|unique:departamentos,sigla,' . $id,
         ]);
 
-
         $departamento = Departamento::findOrFail($id);
         $departamento->update([
             'name' => $request->name,
             'sigla' => $request->sigla,
-            'user_id' => auth()->id(), // Assuming you want to update the departamento with the authenticated user
+            'user_id' => auth()->id()
         ]);
 
         return redirect()->route('departamentos.index')->with('success', 'Departamento atualizado com sucesso!');
