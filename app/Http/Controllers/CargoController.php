@@ -4,26 +4,33 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\Cargo;
+use App\Repositories\CargoRepositoryEloquent;;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class CargoController extends Controller
 {
+    private $cargoRepository;
+
+    public function __construct(CargoRepositoryEloquent $cargoRepository)
+    {
+        $this->cargoRepository = $cargoRepository;
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
-        $search = request()->input('search');
-        $cargos = Cargo::query()
-            ->when($search, function ($query, $search) {
-                return $query->where('name', 'like', "%{$search}%");
-            })->paginate(10);
-
+        $cargos = $this->cargoRepository->buscarPorNome(request()->input('search'));
         return view('cargos', compact('cargos'));
     }
 
     public function create()
     {
-        $departamentos = DB::table('departamentos')->pluck('name', 'id');
+        $departamentos = $this->cargoRepository->nameIdDepartamento();
         return view('cargos.create_cargos', compact('departamentos'));
     }
 
@@ -36,24 +43,21 @@ class CargoController extends Controller
             'nivel' => 'required|string|min:1|max:50',
             'departamento' => 'required|exists:departamentos,id',
         ]);
-
-        $user = User::findOrFail(Auth::id());
-
-        Cargo::create([
-            'name' => $request->name,
-            'descricao' => $request->descricao,
-            'nivel' => $request->nivel,
-            'departamento_id' => $request->departamento,
-            'user_id' => $user->id, // Assuming you want to associate the cargo with the authenticated user
-        ]);
+        
+        $this->cargoRepository->criarOuAtualizarCargo(
+            $request->name,
+            $request->descricao,
+            $request->nivel,
+            $request->departamento
+        );
 
         return redirect()->route('cargos.index')->with('success', 'Cargo adicionado com sucesso!');
     }
 
     public function edit($id)
     {
-        $departamentos = DB::table('departamentos')->pluck('name', 'id');
-        $cargo = Cargo::findOrFail($id);
+        $departamentos = $this->cargoRepository->nameIdDepartamento();
+        $cargo = $this->cargoRepository->findOrFail($id);
         return view('cargos.edit_cargo', compact('cargo', 'departamentos'));
     }
 
@@ -66,25 +70,24 @@ class CargoController extends Controller
             'departamento' => 'required|exists:departamentos,id',
         ]);
 
-        $user = User::findOrFail(Auth::id());
-        $cargo = Cargo::findOrFail($id);
-        $cargo->update([
-            'name' => $request->name,
-            'descricao' => $request->descricao,
-            'nivel' => $request->nivel,
-            'departamento_id' => $request->departamento,
-            'user_id' => $user->id, // Assuming you want to update the cargo with the authenticated user
-        ]);
+        $this->cargoRepository->criarOuAtualizarCargo(
+            $request->name,
+            $request->descricao,
+            $request->nivel,
+            $request->departamento
+        );
 
         return redirect()->route('cargos.index')->with('success', 'Cargo atualizado com sucesso!');
     }
 
     public function destroy($id)
     {
-        $cargo = Cargo::findOrFail($id);
-        $cargo->delete();
-
-        return redirect()->route('cargos.index')->with('success', 'Cargo excluído com sucesso!');
+        if ($this->cargoRepository->verificarCargoTemFuncionarios($id)) {
+            return redirect()->route('cargos.index')->with('error', 'Não é possível excluir este cargo, pois ele está associado a um ou mais funcionários.');
+        }else {
+            $this->cargoRepository->deletarCargo($id);
+            return redirect()->route('cargos.index')->with('success', 'Cargo excluído com sucesso!');
+        }
     }
 
 }

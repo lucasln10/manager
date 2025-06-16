@@ -3,60 +3,38 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Tarefa;
-use App\Models\Funcionario;
-use App\Models\Departamento;
-use App\Models\Cargo;
+use App\Repositories\TarefaRepositoryEloquent;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class TarefasController extends Controller
 {
+    private $tarefaRepository;
+
+    public function __construct(TarefaRepositoryEloquent $tarefaRepository)
+    {
+        $this->tarefaRepository = $tarefaRepository;
+    }
+    /**
+     * Busca as tarefas com base no termo de pesquisa.
+     *
+     * @param string|null $search
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+
     public function index(Request $request)
     {
-        $search = $request->input('search');
-        $searchBool = null;
-        if (strtolower($search) === 'sim' || $search === '1') {
-            $searchBool = 1;
-        } elseif (strtolower($search) === 'não' || strtolower($search) === 'nao' || $search === '0') {
-            $searchBool = 0;
-        }
-
-        $tarefas = Tarefa::when($search, function ($query) use ($search, $searchBool) {
-            $query->where(function ($q) use ($search, $searchBool) {
-                $q->where('titulo', 'like', "%{$search}%");
-                // Busca booleana só se o termo for sim/não/1/0
-                if ($searchBool !== null) {
-                    $q->orWhere('concluida', $searchBool)
-                    ->orWhere('urgente', $searchBool)
-                    ->orWhere('atrasada', $searchBool)
-                    ->orWhere('cancelada', $searchBool)
-                    ->orWhere('pendente', $searchBool);
-                }
-                // Busca por nome do funcionário
-                $q->orWhereHas('funcionario', function ($q2) use ($search) {
-                    $q2->where('name', 'like', "%{$search}%");
-                })
-                // Busca por nome do cargo
-                ->orWhereHas('cargo', function ($q2) use ($search) {
-                    $q2->where('name', 'like', "%{$search}%");
-                })
-                // Busca por nome do departamento
-                ->orWhereHas('departamento', function ($q2) use ($search) {
-                    $q2->where('name', 'like', "%{$search}%");
-                });
-            });
-        })->paginate(10);
+        $tarefas = $this->tarefaRepository->buscarTarefas($request->input('search'));
         return view('tarefas', compact('tarefas'));
     }
 
     public function create()
     {
-        $departamentos = Departamento::all();
-        $cargos = Cargo::all();
-        $funcionarios = Funcionario::all();
+        $dados = $this->tarefaRepository->funcionariosCargosDepartamentos();
+        $funcionarios = $dados['funcionarios'];
+        $departamentos = $dados['departamentos'];
+        $cargos = $dados['cargos'];
         return view('tarefas.create_tarefas', compact('departamentos', 'cargos', 'funcionarios'));
     }
 
@@ -77,24 +55,17 @@ class TarefasController extends Controller
             'cancelada' => 'boolean'
         ]);
 
-        $user = User::findOrFail(Auth::id());
-        $dados = $request->all();
-        $dados['user_id'] = $user->id;
-        if ($request->has('concluida') && $request->concluida) {
-            $dados['data_conclusao'] = Carbon::now()->toDateTimeString();
-        } else {
-            $dados['data_conclusao'] = null;
-        }
-        Tarefa::create($dados);
+        $this->tarefaRepository->criarOuAtualizarTarefa($request->all());
         return redirect()->route('tarefas.index')->with('success', 'Tarefa criada com sucesso');
     }
 
     public function edit($id)
     {
-        $funcionarios = Funcionario::all();
-        $departamentos = Departamento::all();
-        $cargos = Cargo::all();
-        $tarefa = Tarefa::findOrFail($id); // Corrigido: era Auth::id(), agora é o id da tarefa
+        $dados = $this->tarefaRepository->funcionariosCargosDepartamentos();
+        $funcionarios = $dados['funcionarios'];
+        $departamentos = $dados['departamentos'];
+        $cargos = $dados['cargos'];
+        $tarefa = $this->tarefaRepository->findOrFail($id);
         return view('tarefas.edit_tarefas', compact('tarefa', 'funcionarios', 'departamentos', 'cargos'));
     }
 
@@ -115,42 +86,13 @@ class TarefasController extends Controller
             'cancelada' => 'nullable|boolean',
         ]);
 
-        $tarefa = Tarefa::findOrFail($id);
-        $dados = $request->all();
-        $dados['user_id'] = Auth::id();
-        // Garante que todos os campos booleanos sejam enviados (0 ou 1)
-
-        if ($request->has('status')) {
-            $status = $request->input('status');
-            $dados['concluida'] = $status === 'concluida' ? 1 : 0;
-            $dados['pendente'] = $status === 'pendente' ? 1 : 0;
-            $dados['atrasada'] = $status === 'atrasada' ? 1 : 0;
-            $dados['cancelada'] = $status === 'cancelada' ? 1 : 0;
-            // Se quiser tratar "em_andamento" como todos os booleanos zerados:
-            if ($status === 'em_andamento') {
-                $dados['concluida'] = 0;
-                $dados['pendente'] = 0;
-                $dados['atrasada'] = 0;
-                $dados['cancelada'] = 0;
-            }
-        }
-
-        // Atualiza data_conclusao apenas se marcada como concluída
-        if ($dados['concluida']) {
-            $dados['data_conclusao'] = Carbon::now()->toDateTimeString();
-        } else {
-            $dados['data_conclusao'] = null;
-        }
-
-        // Atualiza campos booleanos de acordo com o status selecionado
-
-        $tarefa->update($dados);
+        $this->tarefaRepository->criarOuAtualizarTarefa($request->all());
         return redirect()->route('tarefas.index')->with('success', 'Tarefa atualizada com sucesso');
     }
 
     public function destroy($id)
     {
-        Tarefa::findOrFail($id)->delete();
+        $this->tarefaRepository->delete($id);
         return redirect()->route('tarefas.index')->with('success', 'Tarefa excluída com sucesso');
     }
 }

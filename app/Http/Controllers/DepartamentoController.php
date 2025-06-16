@@ -4,22 +4,26 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\Departamento;
-use App\Models\User;
-use App\Models\Cargo;
+use App\repositories\DepartamentoRepositoryEloquent;
 use Illuminate\Support\Facades\Auth;
 
 class DepartamentoController extends Controller
 {
+    private $departamentoRepository;
+
+    public function __construct(DepartamentoRepositoryEloquent $departamentoRepository)
+    {
+        $this->departamentoRepository = $departamentoRepository;
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
-        $search = request()->input('search');
-        $departamentos = Departamento::query()
-            ->when($search, function ($query, $search) {
-                return $query->where('name', 'like', "%{$search}%")
-                             ->orWhere('sigla', 'like', "%{$search}%");
-            })->paginate(10);
-
+        $departamentos = $this->departamentoRepository->buscarPorDepartamento(request()->input('search'));
         return view('departamentos', compact('departamentos'));
     }
 
@@ -35,18 +39,18 @@ class DepartamentoController extends Controller
             'sigla' => 'required|string|max:10|unique:departamentos,sigla',
         ]);
 
-        Departamento::create([
-            'name' => $request->name,
-            'sigla' => $request->sigla,
-            'user_id' => auth()->id(),
-        ]);
+        $departamento = $this->departamentoRepository->criarOuAtualizarDepartamento(
+            $request->name,
+            $request->sigla
+        );
+
 
         return redirect()->route('departamentos.index')->with('success', 'Departamento adicionado com sucesso!');
     }
 
     public function edit($id)
     {
-        $departamento = Departamento::findOrFail($id);
+        $departamento = $this->departamentoRepository->findOrFail($id);
         return view('departamentos.edit_departamento', compact('departamento'));
     }
 
@@ -57,21 +61,21 @@ class DepartamentoController extends Controller
             'sigla' => 'required|string|max:10|unique:departamentos,sigla,' . $id,
         ]);
 
-        $departamento = Departamento::findOrFail($id);
-        $departamento->update([
-            'name' => $request->name,
-            'sigla' => $request->sigla,
-            'user_id' => auth()->id()
-        ]);
+        $this->departamentoRepository->criarOuAtualizarDepartamento(
+            $request->name,
+            $request->sigla,
+        );
 
         return redirect()->route('departamentos.index')->with('success', 'Departamento atualizado com sucesso!');
     }
 
     public function destroy($id)
     {
-        $departamento = Departamento::findOrFail($id);
-        $departamento->delete();
-
-        return redirect()->route('departamentos.index')->with('success', 'Departamento excluído com sucesso!');
+        if ($this->departamentoRepository->verificarDepartamentoComCargo($id)) {
+            return redirect()->route('departamentos.index')->with('error', 'Não é possível excluir este departamento, pois ele está vinculado a um cargo.');
+        }else {
+            $this->departamentoRepository->deleteDepartamento($id);
+            return redirect()->route('departamentos.index')->with('success', 'Departamento excluído com sucesso!');
+        }
     }
 }
