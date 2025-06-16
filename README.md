@@ -91,8 +91,10 @@ O projeto utiliza Laravel Sanctum para autenticação e proteção de APIs. Cert
 
 Para executar os testes:
 
+Para executar os testes, antes temos que rodar o projeto e criar uma conta, apos isso sera possivel rodar o comando abaixo.
+
 ```bash
-composer test
+php artisan db:seed
 ```
 
 ## 📝 Licença
