@@ -24,7 +24,7 @@ class CargoController extends Controller
      */
     public function index()
     {
-        $cargos = $this->cargoRepository->buscarPorNome(request()->input('search'));
+        $cargos = $this->cargoRepository->buscarCargo(request()->input('search'));
         return view('cargos', compact('cargos'));
     }
 

@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
-use App\Repositories\UserRepository;
+use App\Repositories\Interfaces\UserRepository;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Validators\UserValidator;
@@ -14,7 +14,7 @@ use App\Validators\UserValidator;
  *
  * @package namespace App\Repositories;
  */
-class UserRepositoryEloquent extends BaseRepository implements UserRepository
+class UserRepositoryEloquent extends BaseRepository //implements UserRepository
 {
     /**
      * Specify Model class name

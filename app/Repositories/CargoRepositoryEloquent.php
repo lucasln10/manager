@@ -5,7 +5,7 @@ namespace App\Repositories;
 use Prettus\Repository\Eloquent\BaseRepository;
 use Illuminate\Support\Facades\DB;
 use Prettus\Repository\Criteria\RequestCriteria;
-use App\Repositories\CargoRepository;
+use App\Repositories\Interfaces\CargoRepository;
 use App\Models\{Cargo, Departamento, User, Funcionario};
 use Illuminate\Support\Facades\Auth;
 use App\Validators\CargoValidator;
@@ -15,7 +15,7 @@ use App\Validators\CargoValidator;
  *
  * @package namespace App\Repositories;
  */
-class CargoRepositoryEloquent extends BaseRepository implements CargoRepository
+class CargoRepositoryEloquent extends BaseRepository //implements CargoRepository
 {
     /**
      * Specify Model class name

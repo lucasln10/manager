@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
-use App\Repositories\TarefasRepository;
+use App\Repositories\Interfaces\TarefasRepository;
 use App\Models\Tarefa;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -20,7 +20,7 @@ use function PHPUnit\Framework\isEmpty;
  *
  * @package namespace App\Repositories;
  */
-class TarefaRepositoryEloquent extends BaseRepository implements TarefasRepository
+class TarefaRepositoryEloquent extends BaseRepository //implements TarefasRepository
 {
     /**
      * Specify Model class name
@@ -120,9 +120,9 @@ class TarefaRepositoryEloquent extends BaseRepository implements TarefasReposito
         $departamentos = Departamento::all();
 
         return [
-            'funcionarios' => $funcionarios->pluck('name', 'id'),
-            'cargos' => $cargos->pluck('name', 'id'),
-            'departamentos' => $departamentos->pluck('name', 'id')
+            'funcionarios' => $funcionarios,//->pluck('name', 'id'),
+            'cargos' => $cargos,//->pluck('name', 'id'),
+            'departamentos' => $departamentos//->pluck('name', 'id')
         ];
     }
 

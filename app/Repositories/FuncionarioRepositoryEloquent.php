@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
-use App\Repositories\FuncionarioRepository;
+use App\Repositories\Interfaces\FuncionarioRepository;
 use App\Models\Funcionario;
 use App\Models\Cargo;
 use App\Models\Tarefa;
@@ -16,7 +16,7 @@ use App\Validators\FuncionarioValidator;
  *
  * @package namespace App\Repositories;
  */
-class FuncionarioRepositoryEloquent extends BaseRepository implements FuncionarioRepository
+class FuncionarioRepositoryEloquent extends BaseRepository //implements FuncionarioRepository
 {
     /**
      * Specify Model class name
@@ -77,7 +77,7 @@ class FuncionarioRepositoryEloquent extends BaseRepository implements Funcionari
     public function funcionarioTemTarefas($id)
     {
         $funcionario = Tarefa::where('funcionario_id', $id)->first();
-        return $funcionario->tarefas()->exists();
+        return $funcionario;
     }
 
 }
