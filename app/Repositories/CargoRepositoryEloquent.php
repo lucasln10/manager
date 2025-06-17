@@ -72,5 +72,5 @@ class CargoRepositoryEloquent extends BaseRepository //implements CargoRepositor
         $cargo = Funcionario::where('cargo_id', $id)->first();
         return $cargo;
     }
-    
+
 }
