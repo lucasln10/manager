@@ -35,7 +35,7 @@ class DepartamentoRepositoryEloquent extends BaseRepository //implements Departa
         $this->pushCriteria(app(RequestCriteria::class));
     }
 
-    public function buscarPorDepartamento($search)
+    public function buscarDepartamento($search)
     {
         return Departamento::query()
             ->when($search, function ($query, $search) {
@@ -44,14 +44,27 @@ class DepartamentoRepositoryEloquent extends BaseRepository //implements Departa
             })->paginate(10);
     }
 
-    public function criarOuAtualizarDepartamento($name, $sigla)
+    public function createDepartamento($name, $sigla)
     {
         $userId = Auth::id();
-        return Departamento::updateOrCreate([
+        return Departamento::create([
             'name' => $name,
             'sigla' => $sigla,
             'user_id' => $userId,
         ]);
+    }
+
+    public function updateDepartamento($name, $sigla, $id)
+    {
+        $userId = Auth::id();
+        $departamento = Departamento::findOrFail($id);
+        $departamento->update([
+            'name'  => $name,
+            'sigla' => $sigla,
+            'user_id' => $userId,
+        ]);
+
+        return $departamento;
     }
 
     public function deleteDepartamento($id)

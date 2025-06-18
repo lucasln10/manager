@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\DepartamentosService;
-use App\Repositories\DepartamentoRepositoryEloquent;
 use Carbon\Exceptions\Exception;
 
 class DepartamentoController extends Controller
@@ -12,10 +11,9 @@ class DepartamentoController extends Controller
     private $departamentosService;
     private $departamentoRepository;
 
-    public function __construct(DepartamentosService $departamentosService, DepartamentoRepositoryEloquent $departamentoRepository)
+    public function __construct(DepartamentosService $departamentosService)
     {
         $this->departamentosService = $departamentosService;
-        $this->departamentoRepository = $departamentoRepository;
     }
 
     /**
@@ -23,9 +21,9 @@ class DepartamentoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $departamentos = $this->departamentoRepository->buscarPorDepartamento(request()->input('search'));
+        $departamentos = $this->departamentosService->buscarDepartamentos(request()->input('search'));
         return view('departamentos', compact('departamentos'));
     }
 
@@ -36,19 +34,19 @@ class DepartamentoController extends Controller
 
     public function store(Request $request)
     {
-        $this->departamentosService->criarOuAtualizar($request);
+        $this->departamentosService->criarDepartamento($request);
         return redirect()->route('departamentos.index')->with('success', 'Departamento adicionado com sucesso!');
     }
 
     public function edit($id)
     {
-        $departamento = $this->departamentoRepository->findOrFail($id);
+        $departamento = $this->departamentosService->buscarPorId($id);
         return view('departamentos.edit_departamento', compact('departamento'));
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
-        $this->departamentosService->criarOuAtualizar($request);
+        $this->departamentosService->atualizarDepartamento($request, $id);
         return redirect()->route('departamentos.index')->with('success', 'Departamento atualizado com sucesso!');
     }
 

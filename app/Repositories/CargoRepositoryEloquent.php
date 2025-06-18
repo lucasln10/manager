@@ -49,7 +49,7 @@ class CargoRepositoryEloquent extends BaseRepository //implements CargoRepositor
         return Departamento::all()->pluck('name', 'id');
     }
 
-    public function criarOuAtualizarCargo($name, $descricao, $nivel, $departamento)
+    public function criarCargo($name, $descricao, $nivel, $departamento)
     {
         $userId = Auth::id();
         return Cargo::updateOrCreate([
@@ -57,8 +57,23 @@ class CargoRepositoryEloquent extends BaseRepository //implements CargoRepositor
             'descricao' => $descricao,
             'nivel' => $nivel,
             'departamento_id' => $departamento,
-            'user_id' => $userId, // Assuming you want to associate the cargo with the authenticated user
+            'user_id' => $userId,
         ]);
+    }
+
+    public function atualizarCargo($name, $descricao, $nivel, $departamento, $id)
+    {
+        $userId = Auth::id();
+        $cargo = Cargo::findOrFail($id);
+        $cargo->update([
+            'name' => $name,
+            'descricao' => $descricao,
+            'nivel' => $nivel,
+            'departamento_id' => $departamento,
+            'user_id' => $userId,
+        ]);
+
+        return $cargo;
     }
 
     public function deletarCargo($id)
