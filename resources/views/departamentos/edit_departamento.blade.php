@@ -19,11 +19,10 @@
     <x-card>
         <!-- Validação de erros -->
         @if ($errors->any())
-            <x-alert type="error" class="mb-6">
-                <strong>Ops!</strong> Houve alguns problemas com seus dados.
-                <ul class="mt-2 list-disc list-inside">
+            <x-alert type="error" message="Ops! Por favor, corrija os seguintes erros:" class="mb-6">
+                <ul class="mt-2 list-disc list-inside text-sm">
                     @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
+                        <li>{{ str_replace('The sigla has already been taken.', 'Esta sigla já está sendo utilizada por outro departamento.', $error) }}</li>
                     @endforeach
                 </ul>
             </x-alert>
@@ -45,6 +44,7 @@
                     maxlength="100"
                     value="{{ old('name', $departamento->name) }}"
                     class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary @error('name') border-red-500 @enderror"
+                    placeholder="Digite o nome do departamento"
                 >
                 @error('name')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -62,9 +62,10 @@
                     maxlength="15"
                     value="{{ old('sigla', $departamento->sigla) }}"
                     class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary @error('sigla') border-red-500 @enderror"
+                    placeholder="Digite a sigla do departamento"
                 >
                 @error('sigla')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    <p class="mt-1 text-sm text-red-600">{{ str_replace('The sigla has already been taken.', 'Esta sigla já está sendo utilizada por outro departamento.', $message) }}</p>
                 @enderror
             </div>
 

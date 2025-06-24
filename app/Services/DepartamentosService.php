@@ -13,11 +13,11 @@ class DepartamentosService
         $this->departamentoRepository = $departamentoRepository;
     }
 
-    public function criarOuAtualizar($request)
+    public function criarOuAtualizar($request, $id = null)
     {
         request()->validate([
-            'name' => 'required|string|max:255|unique:departamentos,name',
-            'sigla' => 'required|string|max:10|unique:departamentos,sigla',
+            'name' => 'required|string|max:255|unique:departamentos,name,' . $id,
+            'sigla' => 'required|string|max:10|unique:departamentos,sigla,' . $id,
         ]);
 
         $this->departamentoRepository->criarOuAtualizarDepartamento(

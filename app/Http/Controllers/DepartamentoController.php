@@ -46,9 +46,9 @@ class DepartamentoController extends Controller
         return view('departamentos.edit_departamento', compact('departamento'));
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
-        $this->departamentosService->criarOuAtualizar($request);
+        $this->departamentosService->criarOuAtualizar($request, $id);
         return redirect()->route('departamentos.index')->with('success', 'Departamento atualizado com sucesso!');
     }
 
