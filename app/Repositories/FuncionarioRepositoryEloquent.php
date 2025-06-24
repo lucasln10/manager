@@ -36,6 +36,10 @@ class FuncionarioRepositoryEloquent extends BaseRepository //implements Funciona
         $this->pushCriteria(app(RequestCriteria::class));
     }
 
+    public function buscarPorId($id)
+    {
+        return Funcionario::findOrFail($id);
+    }
 
     public function buscarFuncionarios($search)
     {
@@ -51,11 +55,29 @@ class FuncionarioRepositoryEloquent extends BaseRepository //implements Funciona
         return Cargo::all()->pluck('name', 'id');
     }
 
-    public function criarOuAtualizarFuncionario($data, $imagePath)
+    public function criarFuncionario($data, $imagePath)
     {
         $userId = Auth::id();
         $cargo = Cargo::find($data['cargo']);
         return Funcionario::updateOrCreate([
+            'name' => $data['name'],
+            'nascimento' => $data['nascimento'],
+            'cpf' => $data['cpf'],
+            'email' => $data['email'],
+            'telefone' => $data['telefone'],
+            'cargo_id' => $cargo,
+            'departamento_id' => $cargo->departamento_id,
+            'image' => $imagePath,
+            'user_id' => $userId,
+        ]);
+    }
+
+    public function atualizarFuncionario($data, $imagePath, $id)
+    {
+        $userId = Auth::id();
+        $cargo = Cargo::find($data['cargo']);
+        $funcionario = Funcionario::findOrFail($id);
+        $funcionario->update([
             'name' => $data['name'],
             'nascimento' => $data['nascimento'],
             'cpf' => $data['cpf'],

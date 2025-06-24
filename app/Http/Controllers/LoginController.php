@@ -3,10 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Services\UserService;
 
 class LoginController extends Controller
 {
+    private $userService;
+
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
 
     public function loginView()
     {
@@ -15,23 +21,17 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|min:8',
-        ]);
-
-        if (Auth::attempt($request->only('email', 'password'))) {
+        try{
+            $this->userService->login($request);
             return redirect()->route('home.index');
+        } catch(\Exception $e){
+            return redirect()->route('login')->with('error', $e->getMessage());
         }
-
-        return redirect()->route('login')->with('error', 'Email ou senha inválidos');
     }
 
     public function logout()
     {
-        Auth::guard('web')->logout();
-        session()->invalidate();
-        session()->regenerateToken();
+        $this->userService->logout();
         return redirect()->route('login.view');
     }
 }

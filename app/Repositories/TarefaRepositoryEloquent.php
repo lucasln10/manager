@@ -77,40 +77,19 @@ class TarefaRepositoryEloquent extends BaseRepository //implements TarefasReposi
                         })->paginate(10);
     }
 
-    public function criarOuAtualizarTarefa(array $request)
+    public function criarTarefa(array $request)
     {
         $user = Auth::id();
-        $dados = $request;
-        $dados['user_id'] = $user;
+        $request['user_id'] = $user;
+        return Tarefa::create($request);
+    }
 
-        if (isset($request['status'])) {
-            $status = $request['status'];
-            $dados['concluida'] = $status === 'concluida' ? 1 : 0;
-            $dados['pendente'] = $status === 'pendente' ? 1 : 0;
-            $dados['atrasada'] = $status === 'atrasada' ? 1 : 0;
-            $dados['cancelada'] = $status === 'cancelada' ? 1 : 0;
-            // Se quiser tratar "em_andamento" como todos os booleanos zerados:
-            if ($status === 'em_andamento') {
-                $dados['concluida'] = 0;
-                $dados['pendente'] = 0;
-                $dados['atrasada'] = 0;
-                $dados['cancelada'] = 0;
-            }
-        }
-
-        // Atualiza data_conclusao apenas se marcada como concluída
-        if (!empty($dados['concluida'])) {
-            $dados['data_conclusao'] = Carbon::now()->toDateTimeString();
-        } else {
-            $dados['data_conclusao'] = null;
-        }
-
-        if (isset($dados['id'])) {
-            $condicao = ['id' => $dados['id']];
-            return Tarefa::updateOrCreate($condicao, $dados);
-        } else {
-            return Tarefa::create($dados);
-        }
+    public function atualizarTarefa(array $request, $id)
+    {
+        $user = Auth::id();
+        $tarefa = Tarefa::findOrFail($id);
+        $request['user_id'] = $user;
+        return $tarefa->update($request);
     }
 
     public function funcionariosCargosDepartamentos()
