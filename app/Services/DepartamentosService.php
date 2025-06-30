@@ -23,7 +23,7 @@ class DepartamentosService
     
     public function buscarPorId($id)
     {
-        return $this->departamentoRepository->buscarPorId($id);
+        return $this->departamentoRepository->findOrFail($id);
     }
 
     public function criarDepartamento($request)

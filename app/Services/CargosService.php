@@ -19,13 +19,13 @@ class CargosService
     }
 
     public function nameIdDepartamentos()
-    {
+    { 
         return $this->cargoRepository->nameIdDepartamento();
     }
 
     public function buscarPorId($id)
     {
-        return $this->cargoRepository->buscarPorId($id);
+        return $this->cargoRepository->findOrFail($id);
     }
 
     public function criarCargo($request)

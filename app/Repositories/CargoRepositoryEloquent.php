@@ -35,7 +35,7 @@ class CargoRepositoryEloquent extends BaseRepository //implements CargoRepositor
         $this->pushCriteria(app(RequestCriteria::class));
     }
 
-    public function buscarCargo($name)
+    public function buscarCargos($name)
     {
         $cargos = Cargo::query()
             ->when($name, function ($query, $name) {

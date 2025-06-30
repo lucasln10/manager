@@ -41,7 +41,7 @@ class CargoController extends Controller
 
     public function edit($id)
     {
-        $departamentos = $this->cargoRepository->nameIdDepartamento();
+        $departamentos = $this->cargoService->nameIdDepartamentos();
         $cargo = $this->cargoService->buscarPorId($id);
         return view('cargos.edit_cargo', compact('cargo', 'departamentos'));
     }

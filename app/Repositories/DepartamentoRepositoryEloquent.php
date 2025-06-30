@@ -35,7 +35,7 @@ class DepartamentoRepositoryEloquent extends BaseRepository //implements Departa
         $this->pushCriteria(app(RequestCriteria::class));
     }
 
-    public function buscarDepartamento($search)
+    public function buscarDepartamentos($search)
     {
         return Departamento::query()
             ->when($search, function ($query, $search) {
