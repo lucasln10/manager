@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -26,6 +27,6 @@ return new class extends Migration
 	 */
 	public function down()
 	{
-		Schema::drop('manager_repository_eloquents');
+		Schema::dropIfExists('manager_repository_eloquents');
 	}
 };
